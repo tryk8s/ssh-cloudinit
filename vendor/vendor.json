@@ -1,0 +1,19 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "h+pFYiRHBogczS8/F1NoN3Ata44=",
+			"path": "golang.org/x/crypto/curve25519",
+			"revision": "285fb2ed20d1dc450fc743a1b3ff7c36bef372b9",
+			"revisionTime": "2016-04-26T12:32:32Z"
+		},
+		{
+			"checksumSHA1": "YaQG15rN7vK5LlOxPqNRLfzAIE0=",
+			"path": "golang.org/x/crypto/ssh",
+			"revision": "285fb2ed20d1dc450fc743a1b3ff7c36bef372b9",
+			"revisionTime": "2016-04-26T12:32:32Z"
+		}
+	],
+	"rootPath": "github.com/tryk8s/ssh-cloudinit"
+}
