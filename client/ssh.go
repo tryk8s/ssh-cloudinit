@@ -3,16 +3,11 @@ package client
 import (
 	"fmt"
 	"golang.org/x/crypto/ssh"
+	"io"
 )
 
-func executeCmds(commands []string, conf *Config) (err error) {
-	config := &ssh.ClientConfig{
-		User: conf.User,
-		Auth: []ssh.AuthMethod{
-			ssh.Password(conf.Password),
-		},
-	}
-	conn, err := ssh.Dial("tcp", fmt.Sprintf("%s:%d", conf.Hostname, conf.Port), config)
+func executeCmds(server string, conf *ssh.ClientConfig, stdout io.Writer, commands []string) (err error) {
+	conn, err := ssh.Dial("tcp", server, conf)
 	if err != nil {
 		return
 	}
@@ -23,8 +18,9 @@ func executeCmds(commands []string, conf *Config) (err error) {
 		}
 		defer session.Close()
 
-		session.Stdout = conf.Stdout
+		session.Stdout = stdout
 
+		fmt.Fprintf(stdout, ">>> %s\n", command)
 		err = session.Run(command)
 		if err != nil {
 			return err

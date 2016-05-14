@@ -1,74 +1,45 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
+	"flag"
 	"fmt"
 	"github.com/tryk8s/ssh-cloudinit/client"
-	"io/ioutil"
-	"net/http"
+	"golang.org/x/crypto/ssh/terminal"
 	"os"
+	"syscall"
 )
 
-func defaultHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "OK")
-}
-
-func runHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		fmt.Fprintf(w, "OK")
-		return
-	}
-
-	taskid := r.URL.Query().Get("id")
-	if taskid == "" {
-		fmt.Fprintf(w, "OK")
-		return
-	}
-	conf := &client.Config{
-		Port:   22,
-		Os:     "ubuntu",
-		Stdout: os.Stdout,
-	}
-	defer r.Body.Close()
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	err = json.Unmarshal(body, conf)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	go func() {
-		err := client.Run(conf)
-		if conf.Callback != "" {
-			var result string
-			if err == nil {
-				result = "success"
-			} else {
-				result = "error"
-			}
-			response := struct {
-				id     string
-				result string
-			}{taskid, result}
-			body, err := json.Marshal(response)
-			if err != nil {
-				return
-			}
-			http.Post(conf.Callback, "application/json", bytes.NewBuffer(body))
-		}
-	}()
-
-	fmt.Fprintf(w, "OK")
-}
+var remote = flag.String("remote", "", "Remote cloud-init url")
+var osType = flag.String("os", "ubuntu", "Server OS")
+var port = flag.Int("port", 22, "Server SSH port")
+var user = flag.String("user", "root", "Server SSH user")
 
 func main() {
-	http.HandleFunc("/", defaultHandler)
-	http.HandleFunc("/run", runHandler)
-	http.ListenAndServe(":8080", nil)
+	flag.Usage = func() {
+		fmt.Printf("Usage: ssh-cloudinit [options] <server>\n\n")
+		flag.PrintDefaults()
+	}
+	flag.Parse()
+	args := flag.Args()
+	if len(args) != 1 {
+		flag.Usage()
+		return
+	}
+	fmt.Printf("%s@%s's password: ", *user, args[0])
+	bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Print("\n")
+
+	conf := &client.Config{
+		Hostname: args[0],
+		User:     *user,
+		Password: string(bytePassword),
+		Server:   *remote,
+		Port:     *port,
+		Os:       *osType,
+		Stdout:   os.Stdout,
+	}
+	client.Run(conf)
 }
