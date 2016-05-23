@@ -9,23 +9,32 @@ import (
 	"syscall"
 )
 
-var remote = flag.String("remote", "", "Remote cloud-init url")
-var osType = flag.String("os", "ubuntu", "Server OS")
-var port = flag.Int("port", 22, "Server SSH port")
-var user = flag.String("user", "root", "Server SSH user")
+var (
+	remote string
+	osType string
+	port   int
+	user   string
+)
 
-func main() {
+func init() {
+	flag.StringVar(&remote, "remote", "", "Remote cloud-init url")
+	flag.StringVar(&osType, "os", "ubuntu", "Server OS")
+	flag.IntVar(&port, "port", 22, "Server SSH port")
+	flag.StringVar(&user, "user", "root", "Server SSH user")
 	flag.Usage = func() {
 		fmt.Printf("Usage: ssh-cloudinit [options] <server>\n\n")
 		flag.PrintDefaults()
 	}
+}
+
+func main() {
 	flag.Parse()
 	args := flag.Args()
 	if len(args) != 1 {
 		flag.Usage()
 		return
 	}
-	fmt.Printf("%s@%s's password: ", *user, args[0])
+	fmt.Printf("%s@%s's password: ", user, args[0])
 	bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
 	if err != nil {
 		panic(err)
@@ -34,11 +43,11 @@ func main() {
 
 	conf := &client.Config{
 		Hostname: args[0],
-		User:     *user,
+		User:     user,
 		Password: string(bytePassword),
-		Server:   *remote,
-		Port:     *port,
-		Os:       *osType,
+		Server:   remote,
+		Port:     port,
+		Os:       osType,
 		Stdout:   os.Stdout,
 	}
 	client.Run(conf)
