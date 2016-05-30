@@ -4,16 +4,15 @@ import (
 	"flag"
 	"fmt"
 	"github.com/tryk8s/ssh-cloudinit/client"
-	"golang.org/x/crypto/ssh/terminal"
 	"os"
-	"syscall"
 )
 
 var (
-	remote string
-	osType string
-	port   int
-	user   string
+	remote        string
+	osType        string
+	port          int
+	user          string
+	publicKeyFile string
 )
 
 func init() {
@@ -21,6 +20,7 @@ func init() {
 	flag.StringVar(&osType, "os", "ubuntu", "Server OS")
 	flag.IntVar(&port, "port", 22, "Server SSH port")
 	flag.StringVar(&user, "user", "root", "Server SSH user")
+	flag.StringVar(&publicKeyFile, "key", os.Getenv("HOME")+"/.ssh/id_rsa", "SSH key path")
 	flag.Usage = func() {
 		fmt.Printf("Usage: ssh-cloudinit [options] <server>\n\n")
 		flag.PrintDefaults()
@@ -34,21 +34,14 @@ func main() {
 		flag.Usage()
 		return
 	}
-	fmt.Printf("%s@%s's password: ", user, args[0])
-	bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
-	if err != nil {
-		panic(err)
-	}
-	fmt.Print("\n")
-
 	conf := &client.Config{
-		Hostname: args[0],
-		User:     user,
-		Password: string(bytePassword),
-		Server:   remote,
-		Port:     port,
-		Os:       osType,
-		Stdout:   os.Stdout,
+		Hostname:      args[0],
+		User:          user,
+		PublicKeyFile: publicKeyFile,
+		Server:        remote,
+		Port:          port,
+		Os:            osType,
+		Stdout:        os.Stdout,
 	}
 	client.Run(conf)
 }

@@ -16,6 +16,8 @@ ssh-cloudinit is a provisioning tool that helps you initialize cloud servers thr
 ```bash
 ssh-cloudinit [options] <server>
   
+  -key string
+        SSH key path (default "~/.ssh/id_rsa")
   -os string
         Server OS (default "ubuntu")
   -port int

@@ -5,15 +5,15 @@ import (
 )
 
 type Config struct {
-	Hostname string
-	Port     int
-	User     string
-	Password string
-	Cmds     []string
-	Os       string
-	Server   string
-	Callback string
-	Stdout   io.Writer
+	Hostname      string
+	Port          int
+	User          string
+	PublicKeyFile string
+	Cmds          []string
+	Os            string
+	Server        string
+	Callback      string
+	Stdout        io.Writer
 }
 
 func (conf *Config) GetCmds() []string {
