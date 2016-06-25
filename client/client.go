@@ -26,6 +26,9 @@ func Run(conf *Config) error {
 	if sshPublicKeyAuth := PublicKeyFile(conf.PublicKeyFile); sshPublicKeyAuth != nil {
 		auths = append(auths, sshPublicKeyAuth)
 	}
+	if conf.Password != "" {
+		auths = append(auths, ssh.Password(conf.Password))
+	}
 	passwordAuth := ssh.PasswordCallback(func() (secret string, err error) {
 		fmt.Printf("%s@%s's password: ", conf.User, conf.Hostname)
 		password, err := terminal.ReadPassword(int(syscall.Stdin))

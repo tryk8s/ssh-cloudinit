@@ -8,6 +8,7 @@ type Config struct {
 	Hostname      string
 	Port          int
 	User          string
+	Password      string
 	PublicKeyFile string
 	Cmds          []string
 	Os            string
