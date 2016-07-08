@@ -24,5 +24,8 @@ func (conf *Config) GetCmds() []string {
 	if conf.Os == "ubuntu" {
 		return GetUbuntuCmds(conf)
 	}
+	if conf.Os == "coreos" {
+		return GetCoreOSCmds(conf)
+	}
 	return []string{}
 }
