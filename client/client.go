@@ -44,10 +44,22 @@ func Run(conf *Config) error {
 		Auth: auths,
 	}
 	server := fmt.Sprintf("%s:%d", conf.Hostname, conf.Port)
-	err := executeCmds(server, config, conf.Stdout, conf.GetCmds())
+	conn, err := ssh.Dial("tcp", server, config)
+	if err != nil {
+		return fmt.Errorf("Unable to dial: %v", err)
+	}
+
+	if conf.UserData != "" {
+		err = ensureUserData(conn, conf.Stdout, conf.UserData)
+		if err != nil {
+			return fmt.Errorf("Unable to transfer userdata: %v", err)
+		}
+	}
+
+	err = executeCmds(conn, conf.Stdout, conf.GetCmds())
 	if err != nil {
 		fmt.Printf("Error: %s", err)
-		return err
+		return fmt.Errorf("Unable to execute commands: %v", err)
 	}
 	return nil
 }

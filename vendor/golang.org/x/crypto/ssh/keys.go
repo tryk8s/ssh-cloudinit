@@ -319,8 +319,6 @@ func parseRSA(in []byte) (out PublicKey, rest []byte, err error) {
 
 func (r *rsaPublicKey) Marshal() []byte {
 	e := new(big.Int).SetInt64(int64(r.E))
-	// RSA publickey struct layout should match the struct used by
-	// parseRSACert in the x/crypto/ssh/agent package.
 	wirekey := struct {
 		Name string
 		E    *big.Int
@@ -371,8 +369,6 @@ func parseDSA(in []byte) (out PublicKey, rest []byte, err error) {
 }
 
 func (k *dsaPublicKey) Marshal() []byte {
-	// DSA publickey struct layout should match the struct used by
-	// parseDSACert in the x/crypto/ssh/agent package.
 	w := struct {
 		Name       string
 		P, Q, G, Y *big.Int
@@ -511,8 +507,6 @@ func parseECDSA(in []byte) (out PublicKey, rest []byte, err error) {
 func (key *ecdsaPublicKey) Marshal() []byte {
 	// See RFC 5656, section 3.1.
 	keyBytes := elliptic.Marshal(key.Curve, key.X, key.Y)
-	// ECDSA publickey struct layout should match the struct used by
-	// parseECDSACert in the x/crypto/ssh/agent package.
 	w := struct {
 		Name string
 		ID   string

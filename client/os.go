@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+const UserDataPath = "/tmp/userdata"
+
 func GetUbuntuCmds(conf *Config) []string {
 	s := conf.Server
 	if !strings.HasSuffix(s, "/") {
@@ -22,6 +24,12 @@ func GetUbuntuCmds(conf *Config) []string {
 }
 
 func GetCoreOSCmds(conf *Config) []string {
+	if conf.UserData != "" {
+		return []string{
+			fmt.Sprintf("sudo coreos-cloudinit --from-file=%s", UserDataPath),
+		}
+	}
+
 	return []string{
 		fmt.Sprintf("sudo coreos-cloudinit --from-url=%s", conf.Server),
 	}
