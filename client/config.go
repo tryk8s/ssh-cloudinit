@@ -13,6 +13,7 @@ type Config struct {
 	Cmds          []string
 	Os            string
 	Server        string
+	UserData      string
 	Callback      string
 	Stdout        io.Writer
 }
