@@ -5,17 +5,19 @@ import (
 )
 
 type Config struct {
-	Hostname      string
-	Port          int
-	User          string
-	Password      string
-	PublicKeyFile string
-	Cmds          []string
-	Os            string
-	Server        string
-	UserData      string
-	Callback      string
-	Stdout        io.Writer
+	Hostname                 string
+	Port                     int
+	User                     string
+	Password                 string
+	PublicKeyFile            string
+	Cmds                     []string
+	Os                       string
+	Server                   string
+	DontCleanCloudInitStatus bool
+	UseCloudDataSource       bool
+	UserData                 string
+	Callback                 string
+	Stdout                   io.Writer
 }
 
 func (conf *Config) GetCmds() []string {
@@ -24,8 +26,9 @@ func (conf *Config) GetCmds() []string {
 	}
 	if conf.Os == "ubuntu" {
 		return GetUbuntuCmds(conf)
-	}
-	if conf.Os == "coreos" {
+	} else if conf.Os == "centos" {
+		return GetCentOSCmds(conf)
+	} else if conf.Os == "coreos" {
 		return GetCoreOSCmds(conf)
 	}
 	return []string{}
