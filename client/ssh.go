@@ -97,6 +97,7 @@ func executeCmds(conn *ssh.Client, conf *Config) (err error) {
 			ignoreError = true
 			command = command[2:]
 		}
+		fmt.Printf(">>> %s\n", command)
 		fmt.Fprintf(session.Stdout, ">>> %s\n", command)
 
 		err = session.Run(command)
